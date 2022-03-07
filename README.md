@@ -19,7 +19,7 @@ In this example, I will add a service proxy implementation that will allow micro
 
 Our application uses the Consul Key/Value store to simplify distributed Config management.  
 
-###Tokyo Weather
+### Tokyo Weather
 We have ConsulConfig param in response object which is targeting consul K/V store. 
 
 [Tokyo Weather Api Basic Get request](http://localhost:60002/WeatherForecast)
