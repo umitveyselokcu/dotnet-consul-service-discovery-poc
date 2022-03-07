@@ -70,25 +70,24 @@ public static class ConsulServiceRegistryExtension
 
             configuration
                 .AddConsul($"WeatherApi/{serviceName}/appsettings.json",
-                          options =>
-                          {
-                              options.ConsulConfigurationOptions =
-                                  cco => { cco.Address = new Uri(consulUri); };
-                              options.Optional = true;
-                              options.PollWaitTime = TimeSpan.FromMinutes(1);
-                              options.ReloadOnChange = true;
-                              options.OnLoadException = cxt =>
-                              {
-                                  cxt.Ignore = true;
-                              };
-                              options.OnWatchException = cxt =>
-                              {
-                                  var exp = cxt.Exception;
-                                  return options.PollWaitTime;
-                              };
-                              
-                              
-                          });
+                    options => {
+                        options.ConsulConfigurationOptions = cco =>
+                        {
+                            cco.Address = new Uri(consulUri);
+                        };
+                        options.Optional = true;
+                        options.PollWaitTime = TimeSpan.FromMinutes(1);
+                        options.ReloadOnChange = true;
+                        options.OnLoadException = cxt => 
+                        {
+                            cxt.Ignore = true;
+                        };
+                        options.OnWatchException = cxt => 
+                        {
+                            var exp = cxt.Exception;
+                            return options.PollWaitTime;
+                        }; 
+                    });
         });
     }
     
