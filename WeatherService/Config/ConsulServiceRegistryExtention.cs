@@ -13,7 +13,7 @@ public static class ConsulServiceRegistryExtension
         {
             consulConfig.Address = new Uri(Environment.GetEnvironmentVariable("ConsulAddress") ?? string.Empty);
         }));
-        
+
         services.Configure<WeatherForecastSettings>(configuration.GetSection(nameof(WeatherForecastSettings)));
     }
 
@@ -48,19 +48,17 @@ public static class ConsulServiceRegistryExtension
             Name = appName,
             Address = host,
             Port = port,
-            Checks = new AgentServiceCheck[] { apiHealth, tcpCheck }
+            Checks = new AgentServiceCheck[] {apiHealth, tcpCheck}
         };
 
         logger.LogInformation("Registering with Consul");
         consulClient.Agent.ServiceDeregister(registration.ID).ConfigureAwait(true);
         consulClient.Agent.ServiceRegister(registration).ConfigureAwait(true);
-        lifetime.ApplicationStopping.Register(() =>
-        {
-            logger.LogInformation("Unregistering from Consul");
-        });
-        
+        lifetime.ApplicationStopping.Register(() => { logger.LogInformation("Unregistering from Consul"); });
+
         SeedData(appName, consulClient);
     }
+
     public static void UseDistributedConsulConfig(this IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((context, configuration) =>
@@ -68,40 +66,31 @@ public static class ConsulServiceRegistryExtension
             var consulUri = Environment.GetEnvironmentVariable("ConsulAddress");
             var serviceName = Environment.GetEnvironmentVariable("ServiceName");
 
-            configuration
-                .AddConsul($"WeatherApi/{serviceName}/appsettings.json",
-                    options => {
-                        options.ConsulConfigurationOptions = cco =>
-                        {
-                            cco.Address = new Uri(consulUri);
-                        };
-                        options.Optional = true;
-                        options.PollWaitTime = TimeSpan.FromMinutes(1);
-                        options.ReloadOnChange = true;
-                        options.OnLoadException = cxt => 
-                        {
-                            cxt.Ignore = true;
-                        };
-                        options.OnWatchException = cxt => 
-                        {
-                            var exp = cxt.Exception;
-                            return options.PollWaitTime;
-                        }; 
-                    });
+            configuration.AddConsul($"WeatherApi/{serviceName}/appsettings.json", options =>
+            {
+                options.ConsulConfigurationOptions = cco => { cco.Address = new Uri(consulUri); };
+                options.Optional = true;
+                options.PollWaitTime = TimeSpan.FromMinutes(1);
+                options.ReloadOnChange = true;
+                options.OnLoadException = cxt => { cxt.Ignore = true; };
+                options.OnWatchException = cxt =>
+                {
+                    var exp = cxt.Exception;
+                    return options.PollWaitTime;
+                };
+            });
         });
     }
-    
+
     private static void SeedData(string? appName, IConsulClient consulClient)
     {
         var data = new WeatherForecastSettingsRequest(new WeatherForecastSettings
         {
-            AllCities = true,
-            ForecastType = $"Weather for {appName}"
+            AllCities = true, ForecastType = $"Weather for {appName}"
         });
-        
+
         var stringMessage = JsonConvert.SerializeObject(data, Formatting.None);
         var bytes = Encoding.UTF8.GetBytes(stringMessage);
-
 
         consulClient.KV.Put(new KVPair($"WeatherApi/{appName}/appsettings.json") {Value = bytes}).Wait();
     }
