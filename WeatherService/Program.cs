@@ -2,9 +2,11 @@ using WeatherService.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.WebHost.UseDistributedConsulConfig();
 
-builder.Services.AddConsulConfig();
+builder.Services.AddConsulConfig(builder.Configuration);
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

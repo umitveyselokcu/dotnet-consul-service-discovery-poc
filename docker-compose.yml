@@ -1,7 +1,6 @@
 version: '3.7'
 
-services:
-  
+services:  
   consul-server:
     image: hashicorp/consul:1.10.0
     container_name: consul-server
@@ -41,14 +40,13 @@ services:
       - ServiceName=London
       - ServiceHost=london-weather-service
       - ServicePort=60001
-      - ConsulAddress=http://consulhost:8500    
+      - ConsulAddress=http://consulhost:8500/    
     ports:
       - "60001:80"
     networks:
       bridge-network:
         aliases:
           - consulhost
-          - 
   tokyo-weather-service:
     container_name: tokyo-weather-service
     build:
@@ -58,7 +56,7 @@ services:
       - ServiceName=Tokyo
       - ServiceHost=tokyo-weather-service
       - ServicePort=60002
-      - ConsulAddress=http://consulhost:8500
+      - ConsulAddress=http://consulhost:8500/
     ports:
       - "60002:80"
     networks:
