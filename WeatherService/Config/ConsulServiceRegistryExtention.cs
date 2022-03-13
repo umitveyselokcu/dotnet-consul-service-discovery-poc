@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using Consul;
 using Newtonsoft.Json;
+using WeatherService.Dto;
+using WeatherService.Services;
 using Winton.Extensions.Configuration.Consul;
 
 namespace WeatherService.Config;
@@ -13,7 +15,7 @@ public static class ConsulServiceRegistryExtension
         {
             consulConfig.Address = new Uri(Environment.GetEnvironmentVariable("ConsulAddress") ?? string.Empty);
         }));
-
+        services.AddSingleton<IConsulRegistryService, ConsulRegistryService>();
         services.Configure<WeatherForecastSettings>(configuration.GetSection(nameof(WeatherForecastSettings)));
     }
 
@@ -68,7 +70,10 @@ public static class ConsulServiceRegistryExtension
 
             configuration.AddConsul($"WeatherApi/{serviceName}/appsettings.json", options =>
             {
-                options.ConsulConfigurationOptions = cco => { cco.Address = new Uri(consulUri); };
+                options.ConsulConfigurationOptions = cco =>
+                {
+                    if (consulUri != null) cco.Address = new Uri(consulUri);
+                };
                 options.Optional = true;
                 options.PollWaitTime = TimeSpan.FromMinutes(1);
                 options.ReloadOnChange = true;
@@ -84,9 +89,9 @@ public static class ConsulServiceRegistryExtension
 
     private static void SeedData(string? appName, IConsulClient consulClient)
     {
-        var data = new WeatherForecastSettingsRequest(new WeatherForecastSettings
+        var data = new ConsulPayload<WeatherForecastSettings>(new WeatherForecastSettings
         {
-            AllCities = true, ForecastType = $"Weather for {appName}"
+            AllCities = true, CityName = $"Weather for {appName}"
         });
 
         var stringMessage = JsonConvert.SerializeObject(data, Formatting.None);

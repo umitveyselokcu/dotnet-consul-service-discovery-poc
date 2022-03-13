@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using WeatherService.Config;
+using WeatherService.Dto;
+using WeatherService.Services;
 
 namespace WeatherService.Controllers
 {
@@ -14,25 +16,30 @@ namespace WeatherService.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IOptionsSnapshot<WeatherForecastSettings> _forecasts;
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IOptionsSnapshot<WeatherForecastSettings> forecasts)
+        private readonly IOptionsSnapshot<WeatherForecastSettings> _consulConfigs;
+        private readonly IHumidityProxyService _humidityProxyService;
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IOptionsSnapshot<WeatherForecastSettings> consulConfigs, IHumidityProxyService humidityProxyService)
         {
             _logger = logger;
-            _forecasts = forecasts;
+            _consulConfigs = consulConfigs;
+            _humidityProxyService = humidityProxyService;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<WeatherForecast> Get()
         {
-            _logger.LogInformation($"Consul config: ForecastType: {_forecasts.Value.ForecastType} , AllCities: {_forecasts.Value.AllCities}  ");
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            _logger.LogInformation($"Consul config: ForecastType: {_consulConfigs.Value.CityName} , AllCities: {_consulConfigs.Value.AllCities}");
+
+            var humidity = await _humidityProxyService.GetAsync("Humidity");
+            
+            return new WeatherForecast
             {
-                Date = DateTime.Now.AddDays(index),
+                Date = DateTime.Now,
                 TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)],
-                ConsulConfig = $"ConsulConfig: ForecastType: {_forecasts.Value.ForecastType} , AllCities: {_forecasts.Value.AllCities}"
-            })
-            .ToArray();
+                City = _consulConfigs.Value.CityName,
+                ConsulConfig = $"ConsulConfig: ForecastType: {_consulConfigs.Value.CityName} , AllCities: {_consulConfigs.Value.AllCities}",
+                Humidity = humidity.CurrentHumidity
+            };
         }
     }
 }
