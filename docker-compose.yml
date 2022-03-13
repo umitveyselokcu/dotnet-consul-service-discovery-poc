@@ -63,7 +63,22 @@ services:
       bridge-network:
         aliases:
           - consulhost    
-
+  humidity-service:
+    container_name: humidity-service
+    build:
+      context: .
+      dockerfile: HumidityService/Dockerfile
+    environment:
+      - ServiceName=Humidity
+      - ServiceHost=humidity-service
+      - ServicePort=60010
+      - ConsulAddress=http://consulhost:8500/
+    ports:
+      - "60010:80"
+    networks:
+      bridge-network:
+        aliases:
+          - consulhost
 networks:
   bridge-network:
     driver: bridge
