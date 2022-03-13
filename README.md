@@ -56,7 +56,7 @@ Our applications use the Consul Key/Value store to simplify distributed Config m
 
 You can change some settings on Consul Key/Value store and check api response to see how easy to change settings on runtime.
 
-To try, you can change 'DetailedResponse' to true/false in [Humidity Api, Key/Value Store](http://localhost:8500/ui/dc1/kv/HumidityApi/Humidity/appsettings.json/edit) and see the change in 'humidity' in responses  [Tokyo Weather Api Basic Get request](http://localhost:60002/WeatherForecast) and [Humidity Api, Get](http://localhost:60010/WeatherForecast) and [London Weather Api, Get](http://localhost:60001/WeatherForecast) .
+To try, you can change 'DetailedResponse' to true/false in [Humidity Api, Key/Value Store](http://localhost:8500/ui/dc1/kv/HumidityApi/Humidity/appsettings.json/edit) and see the change in 'humidity' in responses  [Tokyo Weather Api Basic Get request](http://localhost:60002/WeatherForecast) and [Humidity Api, Get](http://localhost:60010/Humidity) and [London Weather Api, Get](http://localhost:60001/WeatherForecast) .
 
 
 Seeding K/V store with dummy data on start up
@@ -85,10 +85,6 @@ Than call it from constructor as you need
 #### Usage on .Net
 
 We can use ```IOptions<T>``` to for configs you are not expecting to change, use ```IOptionsSnapsot<T>``` for configs to be consistent for the entirety of a request and use ```IOptionsMonitor<T>``` to get real time config values.
-
-
-
-
 
 #### Links for Tokyo Weather API and Key/Value Store
 
