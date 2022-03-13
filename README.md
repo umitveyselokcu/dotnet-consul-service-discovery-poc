@@ -82,9 +82,15 @@ Than call it from constructor as you need
 ```
     IOptionsSnapshot<WeatherForecastSettings> _consulConfigs
 ```
-#### Usage on .Net
+### Usage on .Net
 
-We can use ```IOptions<T>``` to for configs you are not expecting to change, use ```IOptionsSnapsot<T>``` for configs to be consistent for the entirety of a request and use ```IOptionsMonitor<T>``` to get real time config values.
+We can use ```IOptions<T>``` to for configs you are not expecting to change,
+
+use ```IOptionsSnapsot<T>``` for configs to be consistent for the entirety of a request and 
+
+use ```IOptionsMonitor<T>``` to get real time config values.
+
+
 
 #### Links for Tokyo Weather API and Key/Value Store
 
@@ -102,7 +108,7 @@ We can use ```IOptions<T>``` to for configs you are not expecting to change, use
 
 [Humidity Api, swagger](http://localhost:60001/swagger/index.html)
 
-### Links for Humidity API and Key/Value Store
+#### Links for Humidity API and Key/Value Store
 
 [Humidity Api, Key/Value Store](http://localhost:8500/ui/dc1/kv/HumidityApi/Humidity/appsettings.json/edit)
 
